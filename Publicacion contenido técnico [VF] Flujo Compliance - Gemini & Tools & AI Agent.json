@@ -185,7 +185,7 @@
           "mode": "list",
           "cachedResultName": "general-publicaciones-compliance"
         },
-        "text": "=📢 *Contenido de Compliance Publicado con Éxito*  • *Idea Semilla:* {{ $('Control HITL Pre-procesamiento - Validar Aprobación').itemMatching(0).json.fields['Idea Semilla'] }} • *Estado Notion:* Publicado • *Plataforma:* Telegram",
+        "text": "=📢 *Contenido de Compliance Publicado con Éxito*\n\n• *Idea Semilla:* {{ $('Actualización de datos en base de control Notion').item.json['Idea Semilla'] || $('Control HITL Pre-procesamiento - Validar Aprobación').item.json['Idea Semilla'] }}\n• *Estado Notion:* Publicado\n• *Plataforma:* Telegram",
         "otherOptions": {}
       },
       "type": "n8n-nodes-base.slack",
@@ -373,7 +373,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "8dcb99e0-f557-49ed-907a-463972c9d3c5",
+  "versionId": "6cff2227-45f0-4809-892d-3275d779d1bd",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "64173c8d89661ee14c29ac9ac21df61c7124801590982f1347b6434570054f65"
