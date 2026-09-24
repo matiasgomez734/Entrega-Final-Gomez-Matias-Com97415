@@ -1,0 +1,384 @@
+{
+  "name": "Publicacion contenido técnico [v3] Flujo Compliance - Gemini & Tools copy & AI Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "authentication": "oAuth2",
+        "event": "pagedUpdatedInDatabase",
+        "dataSourceId": {
+          "__rl": true,
+          "value": "3e51cdc1-4397-8011-8db9-000bee3e5bf8",
+          "mode": "list",
+          "cachedResultName": "Centro de comando operativo",
+          "cachedResultUrl": "https://app.notion.com/p/3e51cdc143978005b8baf288fc5c2496"
+        }
+      },
+      "type": "n8n-nodes-base.notionTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -464,
+        16
+      ],
+      "id": "a52c014c-089a-49da-8f9a-323e71dfb9dc",
+      "name": "Actualización de datos en base de control Notion",
+      "credentials": {
+        "notionOAuth2Api": {
+          "id": "NbUbwCen02mS8UhZ",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f5690f17-c1a9-4be5-a1d7-77a0311dd8f4",
+              "leftValue": "={{ $json.Aprobado }}",
+              "rightValue": "={{ true }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -240,
+        16
+      ],
+      "id": "b68a935a-ba94-4f31-9cf5-87f13b0831ce",
+      "name": "Control HITL Pre-procesamiento - Validar Aprobación"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=ROL Y CONTEXTO:\nEres un Asistente Senior especializado en Compliance, Tax Automation y Normativa Impositiva. Tu objetivo es transformar ideas o novedades normativas en comunicados ejecutivos, rigurosos y profesionales para los canales oficiales de la organización.\n\nDATOS DE ENTRADA:\n- IDEA SEMILLA: \"{{ $json[\"Idea Semilla\"] }}\"\n- CONTEXTO / BORRADOR PREVIO: \"{{ $json[\"Borrador IA\"] }}\"\n\nTAREA:\nGenera una síntesis ejecutiva basada en la IDEA SEMILLA y el CONTEXTO provisto, enfocada en los aspectos clave de cumplimiento impositivo, plazos y procedimientos relevantes para la organización.\n\nREGLAS ESTRICTAS DE FORMATO Y ESTILO:\n1. USO DE EMOJIS CORPORATIVOS:\n   - Utiliza emojis estratégicos y profesionales para estructurar la lectura (ejemplos: 📢 para títulos/comunicados, 📌 para viñetas principales, ⚠️ para alertas o controles, 💡 para notas/aclaraciones).\n\n2. FORMATO COMPATIBLE (HTML):\n   - Usa ÚNICAMENTE etiquetas HTML para dar formato: <b>texto en negrita</b> e <i>texto en cursiva</i>.\n   - Queda ESTRICTAMENTE PROHIBIDO usar Markdown (no utilices asteriscos **, guiones bajos _, ni encabezados #).\n   - Queda PROHIBIDO el uso de etiquetas de listas HTML (no uses <ul>, <ol> ni <li>). Estructura los puntos mediante viñetas acompañadas de emojis.\n\n3. RESTRICCIÓN ESTRICTA DE LONGITUD:\n   - La respuesta completa (incluyendo etiquetas HTML, emojis y espacios) NO DEBE SUPERAR bajo ninguna circunstancia los 1.700 caracteres. Esto es indispensable para evitar fallos de almacenamiento en Notion.\n\n4. TONO Y LENGUAJE:\n   - Tono corporativo, claro, directo y profesional. Evita rodeos e introducciones innecesarias.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        64,
+        -96
+      ],
+      "id": "9bf1e938-20c6-4bd0-8a28-338976d08ae6",
+      "name": "Generador Comunicados Compliance",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "modelName": "=models/gemini-3.1-flash-liteERROR",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        176,
+        160
+      ],
+      "id": "a4ccefa1-5d3e-489b-a431-ac0fc63f5329",
+      "name": "Motor LLM: Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "543Wjy2xwAfO8JfZ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "8911512555",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        768,
+        208
+      ],
+      "id": "4783e31f-6217-4413-a35b-c6a14ad9873a",
+      "name": "Notificar Canal Telegram",
+      "webhookId": "6cc0ad18-d12b-434f-b4e2-718ae1c77d19",
+      "credentials": {
+        "telegramApi": {
+          "id": "RDqybkCblVcnoSMw",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $('Control HITL Pre-procesamiento - Validar Aprobación').itemMatching(0).json.id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Borrador IA|rich_text",
+              "textContent": "={{ $('Generador Comunicados Compliance').item.json.output }}"
+            },
+            {
+              "key": "Fecha de Ejecución|date",
+              "includeTime": false,
+              "date": "={{ new Date().toISOString() }}"
+            },
+            {
+              "key": "Estado|select",
+              "selectValue": "Publicado"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 3,
+      "position": [
+        944,
+        96
+      ],
+      "id": "1c00974a-6134-46af-b0d2-37eb3640feb6",
+      "name": "Notion: Actualizar Estado a Publicado",
+      "credentials": {
+        "notionOAuth2Api": {
+          "id": "NbUbwCen02mS8UhZ",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0C42JA2HHQ",
+          "mode": "list",
+          "cachedResultName": "general-publicaciones-compliance"
+        },
+        "text": "=📢 *Contenido de Compliance Publicado con Éxito*  • *Idea Semilla:* {{ $('Control HITL Pre-procesamiento - Validar Aprobación').itemMatching(0).json.fields['Idea Semilla'] }} • *Estado Notion:* Publicado • *Plataforma:* Telegram",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        1168,
+        96
+      ],
+      "id": "08cfddeb-2f8b-4ac4-9a9a-978852b5e0fc",
+      "name": "Notificar Canal Slack",
+      "webhookId": "8ef1dcaa-ccb2-41db-8044-320569bb0c55",
+      "credentials": {
+        "slackApi": {
+          "id": "SKyibZ9iDJUP0XXl",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $('Control HITL Pre-procesamiento - Validar Aprobación').itemMatching(0).json.id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Log Error|rich_text",
+              "textContent": "={{ $json.error?.message || $json.error || $json.message || \"Error al procesar con el LLM\" }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 3,
+      "position": [
+        880,
+        -208
+      ],
+      "id": "69958540-cc7f-4d6b-8864-e904530b71fe",
+      "name": "Notion: Registrar Log de Error",
+      "credentials": {
+        "notionOAuth2Api": {
+          "id": "NbUbwCen02mS8UhZ",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "matias.gomez@fce.uncu.edu.ar",
+        "subject": "⚠️ Alerta de Error en flujo de Publicación de Contenido Técnico - Revisar Log",
+        "message": "=Se ha detectado un fallo al generar el contenido de Compliance.\n\n{{ $node['Generador Comunicados Compliance'].json.error?.message || $json.property_log_error || $json.error?.message || \"Error no especificado\" }}\n\nID de la página afectada:\n{{ $('Control HITL Pre-procesamiento - Validar Aprobación').itemMatching(0).json.id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1104,
+        -208
+      ],
+      "id": "39755833-eba8-40da-9d30-a79ef7423e99",
+      "name": "Gmail: Alerta Crítica a Soporte",
+      "webhookId": "8cb56677-0217-4453-9c91-9782102c0014",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "rlXk8lBdTVjnx4Ra",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        176
+      ],
+      "id": "5ab9c567-6f08-40d2-80b8-c02868098c6c",
+      "name": "Fin - Espera de Aprobación Humana"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Actualización de datos en base de control Notion": {
+      "main": [
+        [
+          {
+            "node": "Control HITL Pre-procesamiento - Validar Aprobación",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Control HITL Pre-procesamiento - Validar Aprobación": {
+      "main": [
+        [
+          {
+            "node": "Generador Comunicados Compliance",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fin - Espera de Aprobación Humana",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generador Comunicados Compliance": {
+      "main": [
+        [
+          {
+            "node": "Notificar Canal Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Notion: Registrar Log de Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Motor LLM: Google Gemini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generador Comunicados Compliance",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notificar Canal Telegram": {
+      "main": [
+        [
+          {
+            "node": "Notion: Actualizar Estado a Publicado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion: Actualizar Estado a Publicado": {
+      "main": [
+        [
+          {
+            "node": "Notificar Canal Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion: Registrar Log de Error": {
+      "main": [
+        [
+          {
+            "node": "Gmail: Alerta Crítica a Soporte",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "8dcb99e0-f557-49ed-907a-463972c9d3c5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "64173c8d89661ee14c29ac9ac21df61c7124801590982f1347b6434570054f65"
+  },
+  "nodeGroups": [],
+  "id": "wOFl8bYYFamk4vcG",
+  "tags": []
+}
