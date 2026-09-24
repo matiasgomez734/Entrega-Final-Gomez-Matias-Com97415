@@ -27,3 +27,4 @@ Este proyecto implementa un ecosistema de automatización para el procesamiento,
 * `workflow.json`: Exportación completa del flujo técnico en n8n.
 * `Entrega Final Gomez Matías Com87415.pdf`: Documento de presentación técnica con diagrama, matriz de costos y manual operativo.
 * `/evidencias/`: Capturas de pantalla demostrativas del flujo feliz, filtro HITL y ruta de errores.
+* VIDEO EXPLICATIVO ---> [https://drive.google.com/file/d/13Bq8KjZcHSSnACJpAPQyXlq90Vbs3Suj/view?usp=sharing](url)
